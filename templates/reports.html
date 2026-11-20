@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block t %}Reports{% endblock %}{% block body %}
+<h2>Monthly Reports — {{ month }}</h2>
+<p><a class="btn" href="{{ url_for('sales_register_csv') }}">Sales register (CSV)</a>
+<a class="btn" href="{{ url_for('sales_register_xlsx') }}">Sales register (Excel)</a></p>
+{% for a in alerts %}<div class="alert"><strong>Variance alert:</strong> {{ a }}</div>{% endfor %}
+<div class="card"><h3>Sales register</h3><table>
+<tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Qty</th><th class="num">Taxable</th><th class="num">CGST</th><th class="num">SGST</th><th class="num">IGST</th><th class="num">Total</th></tr>
+{% for s in sales %}<tr><td>{{ s.invoice_no }}</td><td>{{ s.invoice_date }}</td><td>{{ s.cname }}</td><td class="num">{{ s.qty }}</td><td class="num">{{ fmt_money(s.taxable_paise) }}</td><td class="num">{{ fmt_money(s.cgst_paise) }}</td><td class="num">{{ fmt_money(s.sgst_paise) }}</td><td class="num">{{ fmt_money(s.igst_paise) }}</td><td class="num">{{ fmt_money(s.total_paise) }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>GST summary</h3>
+<p>Taxable {{ fmt_money(gst.taxable) }} | CGST {{ fmt_money(gst.cgst) }} | SGST {{ fmt_money(gst.sgst) }} | IGST {{ fmt_money(gst.igst) }} | <b>Total {{ fmt_money(gst.total) }}</b></p></div>
+<div class="card"><h3>Ageing of receivables</h3><table>
+<tr><th>Invoice</th><th>Customer</th><th class="num">Outstanding</th><th class="num">Days</th><th>Bucket</th></tr>
+{% for r, bal, days, bucket in ageing %}<tr><td>{{ r.invoice_no }}</td><td>{{ r.cname }}</td><td class="num">{{ fmt_money(bal) }}</td><td class="num">{{ days }}</td><td>{{ bucket }}</td></tr>{% endfor %}</table></div>
+{% endblock %}
