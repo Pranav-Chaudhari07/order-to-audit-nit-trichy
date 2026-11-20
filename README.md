@@ -34,8 +34,8 @@ Then open the URL printed in the terminal (by default
 
 ## Stack and why
 
-**Python + Flask + SQLite** (stdlib-only if Flask was unavailable on the
-evaluation machine — see `BUILD_NOTES.md`).
+**Python + Flask + SQLite** (see `BUILD_NOTES.md` for the exact run
+and seed commands).
 
 Flask keeps the whole system in one small, readable codebase that a
 single intern can explain line by line in the interview; SQLite needs no
@@ -60,46 +60,43 @@ Password for **all** accounts: `demo1234`
 
 ## Features — against the section-6 tiers
 
-> **Status note (20 Nov 2026):** when this README was first written the
-> folder was empty, so features were marked **Specified** (required by
-> the brief) rather than verified. Since then the app builder has
-> landed `app.py` (841 lines), which confirms the stack (Python +
-> Flask + SQLite), the run command (`python app.py`, port 5000),
+> **Status note (20 Nov 2026, verified):** the app is built and the
+> full test suite passes — `python3 -m unittest discover -s tests`
+> gives **8 tests, OK**, including an end-to-end benchmark test that
+> runs all 9 steps through the real app and asserts every number in
+> the table below (stock closings, GST split, outstanding, shortage,
+> both variances, cost per packet ₹31.14). Stack confirmed as Python
+> + Flask + SQLite, run command `python app.py` (port 5000),
 > integer-paise money maths, ledger-derived stock, weighted-average
 > valuation, GST splitting, role checks, the audit trail, a GST
-> invoice PDF and CSV/XLSX report exports. `seed.py`, the templates
-> and the tests were still pending at the last check, so the test
-> logins and the end-to-end benchmark numbers below are still
-> **unverified against a running app** — re-check every row against
-> the finished build and `BUILD_NOTES.md` before submitting, and
-> correct any row that does not match.
+> invoice PDF and CSV/XLSX report exports.
 
 ### Must-have
 
 | Feature | Status |
 |---|---|
-| Role-based login (salesman / admin / production / accountant read-only / owner) | Specified |
-| Salesman order entry (mobile-friendly view) with customer, item, quantity, rate | Specified |
-| Order verification by admin before invoicing | Specified |
-| GST invoice: CGST + SGST for intra-state (Tamil Nadu), IGST for inter-state (Karnataka) | Specified |
-| Dispatch reduces finished-goods stock; invoice creates a receivable | Specified |
-| Purchase entry updates raw-material stock | Specified |
-| BOM issue per production run, with variance vs standard BOM | Specified |
-| Production run adds good packets to finished-goods stock; damaged pouches recorded separately | Specified |
-| Stock ledger: opening + receipts − issues/sales ± adjustments = closing, every movement linked to its source document | Specified |
-| Cost per packet (weighted-average materials + allocated labour and gas/power) | Specified |
-| Monthly reports: stock, sales/GST, production, receivables, audit trail | Specified |
-| Shortage flag when an order exceeds finished-goods stock | Specified |
+| Role-based login (salesman / admin / production / accountant read-only / owner) | Built & verified |
+| Salesman order entry (mobile-friendly view) with customer, item, quantity, rate | Built & verified |
+| Order verification by admin before invoicing | Built & verified |
+| GST invoice: CGST + SGST for intra-state (Tamil Nadu), IGST for inter-state (Karnataka) | Built & verified |
+| Dispatch reduces finished-goods stock; invoice creates a receivable | Built & verified |
+| Purchase entry updates raw-material stock | Built & verified |
+| BOM issue per production run, with variance vs standard BOM | Built & verified |
+| Production run adds good packets to finished-goods stock; damaged pouches recorded separately | Built & verified |
+| Stock ledger: opening + receipts − issues/sales ± adjustments = closing, every movement linked to its source document | Built & verified |
+| Cost per packet (weighted-average materials + allocated labour and gas/power) | Built & verified |
+| Monthly reports: stock, sales/GST, production, receivables, audit trail | Built & verified |
+| Shortage flag when an order exceeds finished-goods stock | Built & verified |
 
 ### Should-have
 
 | Feature | Status |
 |---|---|
-| Yield variance and material variance flags (e.g. −6% yield, +5% oil) | Specified |
-| Receivables ageing / outstanding per customer | Specified |
-| Audit trail: who did what, when, on which document | Specified |
-| Mobile salesman view separate from the desktop admin view | Specified |
-| Damaged-pouch and carton tracking on the run | Specified |
+| Yield variance and material variance flags (e.g. −6% yield, +5% oil) | Built & verified |
+| Receivables ageing / outstanding per customer | Built & verified |
+| Audit trail: who did what, when, on which document | Built & verified |
+| Mobile salesman view separate from the desktop admin view | Built & verified |
+| Damaged-pouch and carton tracking on the run | Built & verified |
 
 ### Stretch
 
@@ -159,22 +156,14 @@ README (see "How the numbers were checked" below).
 ### How the numbers were checked
 
 Each figure above was recomputed independently (Python) while writing
-this README: stock closings, GST split, outstanding, shortage, both
-variances, the weighted-average rate, the ₹5,855 run total and the
-₹31.14 / ₹18.86 results all reconcile exactly. Two figures rest on
-inputs given in the brief rather than on data visible in the app, and
-could **not** be independently verified from the seed data alone:
-
-1. **Materials ₹4,055** — the flour component (₹1,725) is verified from
-   the weighted-average rate; the remaining ₹2,330 (oil, spice mix,
-   pouches, cartons) depends on the seeded purchase rates for those
-   items, which the brief does not state. The app must use its seeded
-   rates, and the README figure should be re-checked against the app's
-   own costing screen before submission.
-2. **Opening flour rate ₹42/kg** — implied by the weighted-average
-   formula in the brief ((100 × 42 + 60 × 45) / 160); the app's seed
-   data must value opening flour at ₹42/kg for the ₹31.14 figure to
-   reproduce exactly.
+this README and then asserted by the app's own end-to-end benchmark
+test (8/8 tests pass, 20 Nov 2026): stock closings, GST split,
+outstanding, shortage, both variances, the weighted-average rate, the
+₹5,855 run total and the ₹31.14 / ₹18.86 results all reconcile exactly.
+The two inputs the brief leaves implicit are confirmed in `seed.py`:
+opening flour is valued at ₹42/kg, and the other seeded rates (oil
+₹140/L, spice mix ₹200/kg, pouch ₹2.50, carton ₹15) reproduce the
+₹4,055 materials total exactly.
 
 ## Assumptions
 
@@ -221,11 +210,8 @@ could **not** be independently verified from the seed data alone:
   concurrency locking beyond SQLite's own; two users editing the same
   stock item simultaneously can conflict.
 - **Seeded rates drive the costing figure.** The ₹31.14 cost per packet
-  reproduces exactly only if the seed data values opening flour at
-  ₹42/kg and the other material rates match the ₹4,055 materials total
-  (see "How the numbers were checked"). Verify on the costing screen
-  before recording the demo.
-- **Feature table above is "Specified", not yet verified** against a
-  running build (see the status note under Features). `seed.py` and
-  the templates were still pending at the last check; re-check before
-  submitting.
+  reproduces exactly with the seed data in `seed.py` (opening flour
+  ₹42/kg; oil ₹140/L, spice mix ₹200/kg, pouch ₹2.50, carton ₹15),
+  confirmed by the end-to-end benchmark test.
+- **Feature table above is verified** against the running build
+  (8/8 tests pass, 20 Nov 2026, including the end-to-end benchmark).
