@@ -36,6 +36,22 @@
   voiceover against the same script and timings — the visuals and the
   section timings below stay valid.
 
+## Voiceover fix (20 Nov 2026, after first upload)
+
+- The first upload's intro said **"Pronov Chaudari"** and **"BTEC"** —
+  the TTS engine misread "Pranav Chaudhari" and "B.Tech". Only the
+  first sentence was re-recorded, with phonetic respelling
+  ("Pra-nav Choud-hari", degree written out as "Bachelor of
+  Technology") and spliced into the first 5.72 seconds of the audio;
+  the rest of the narration and all visuals are untouched.
+- The fixed take was verified by transcribing the final file with two
+  speech-to-text models (Whisper tiny + base): both hear "Pranav
+  Chowdhari, a third-year Bachelor of Technology…". "Chowdhari" is
+  the same name (चौधरी) in its most common English spelling — that is
+  the spelling the engine pronounces correctly. Duration is unchanged
+  at 5:05. The Drive file was updated in place, so the shareable link
+  is unchanged.
+
 ## Sections (timestamps)
 
 | Time | Section | What is shown |
