@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block t %}Masters{% endblock %}{% block body %}
+<h2>Masters</h2>
+<div class="card"><h3>Products</h3><table>
+<tr><th>SKU</th><th>Name</th><th>Price</th><th>GST</th><th>HSN</th></tr>
+{% for p in products %}<tr><td>{{ p.sku }}</td><td>{{ p.name }}</td><td>{{ fmt_money(p.selling_price_paise) }}</td><td>{{ p.gst_rate_pct }}%</td><td>{{ p.hsn }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Customers</h3><table>
+<tr><th>Name</th><th>Type</th><th>State</th><th>GSTIN</th></tr>
+{% for c in customers %}<tr><td>{{ c.name }}</td><td>{{ c.type }}</td><td>{{ c.state }}</td><td>{{ c.gstin or '—' }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Raw materials</h3><table>
+<tr><th>SKU</th><th>Name</th><th>Unit</th><th class="num">Avg rate</th></tr>
+{% for m in materials %}<tr><td>{{ m.sku }}</td><td>{{ m.name }}</td><td>{{ m.unit }}</td><td class="num">{{ fmt_money(m.avg_rate_mp // 1000) }}/{{ m.unit }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>BOM (per batch)</h3><table>
+<tr><th>Product</th><th>Material</th><th class="num">Qty per batch</th><th class="num">Expected output</th></tr>
+{% for b in boms %}<tr><td>{{ b.pname }}</td><td>{{ b.mname }}</td><td class="num">{{ fmt_qty(b.qty_milli_per_batch, b.unit) }}</td><td class="num">{{ b.expected_output_packets }} packets</td></tr>{% endfor %}</table></div>
+{% endblock %}

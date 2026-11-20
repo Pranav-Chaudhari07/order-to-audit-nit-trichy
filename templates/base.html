@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block t %}Order-to-Audit{% endblock %} — Snacks Co.</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body>
+<header><div><strong>South Indian Snacks Co.</strong> — Order-to-Audit</div>
+<div>{% if user %}{{ user.full_name }} ({{ user.role }}) <a href="{{ url_for('logout') }}">Sign out</a>{% endif %}</div></header>
+{% if user %}<nav>
+<a href="{{ url_for('dashboard') }}">Dashboard</a>
+<a href="{{ url_for('orders') }}">Orders</a>
+<a href="{{ url_for('invoices') }}">Invoices</a>
+<a href="{{ url_for('payments') }}">Payments</a>
+<a href="{{ url_for('production') }}">Production</a>
+<a href="{{ url_for('purchases') }}">Purchases</a>
+<a href="{{ url_for('stock') }}">Stock</a>
+<a href="{{ url_for('reports') }}">Reports</a>
+{% if user.role in ('admin','owner') %}<a href="{{ url_for('masters') }}">Masters</a>{% endif %}
+{% if user.role in ('admin','owner','accountant') %}<a href="{{ url_for('audit_trail') }}">Audit Trail</a>{% endif %}
+</nav>{% endif %}
+<main>
+{% with msgs = get_flashed_messages(with_categories=true) %}{% for cat, m in msgs %}
+<div class="flash {{ cat }}">{{ m }}</div>{% endfor %}{% endwith %}
+{% block body %}{% endblock %}</main></body></html>

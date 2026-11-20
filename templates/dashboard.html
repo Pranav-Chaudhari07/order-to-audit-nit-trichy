@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block t %}Dashboard{% endblock %}{% block body %}
+<h2>Dashboard — {{ role|title }}</h2>
+{% for a in alerts %}<div class="alert"><strong>Variance alert:</strong> {{ a }}</div>{% endfor %}
+<div class="grid">
+<div class="card"><h3>Pending orders</h3><p style="font-size:2rem;margin:0">{{ pending_orders }}</p></div>
+<div class="card"><h3>Sales this month</h3><p style="font-size:2rem;margin:0">{{ fmt_money(month_sales) }}</p></div>
+<div class="card"><h3>Total outstanding</h3><p style="font-size:2rem;margin:0">{{ fmt_money(outstanding) }}</p></div>
+</div>
+<div class="card"><h3>Finished-goods stock</h3><table>
+<tr><th>Product</th><th class="num">Packets in stock</th></tr>
+{% for p, b in fg %}<tr><td>{{ p.name }}</td><td class="num">{{ b // 1000 }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Raw-material stock</h3><table>
+<tr><th>Material</th><th class="num">Balance</th><th class="num">Avg rate</th></tr>
+{% for m, b in rm %}<tr><td>{{ m.name }}</td><td class="num">{{ fmt_qty(b, m.unit) }}</td><td class="num">{{ fmt_money(m.avg_rate_mp // 1000) }}/{{ m.unit }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Recent production runs</h3><table>
+<tr><th>Run</th><th>Product</th><th>Expected</th><th>Good</th><th>Cost/packet</th></tr>
+{% for r in recent_runs %}<tr><td>#{{ r.id }}</td><td>{{ r.pname }}</td><td>{{ r.expected_packets }}</td><td>{{ r.good_packets }}</td><td>{{ fmt_money(r.cost_per_packet_paise or 0) }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Recent invoices</h3><table>
+<tr><th>Invoice</th><th>Customer</th><th class="num">Total</th><th>Status</th></tr>
+{% for i in recent_invoices %}<tr><td>{{ i.invoice_no }}</td><td>{{ i.cname }}</td><td class="num">{{ fmt_money(i.total_paise) }}</td><td>{{ i.status }}</td></tr>{% endfor %}</table></div>
+{% endblock %}
