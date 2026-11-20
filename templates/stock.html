@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block t %}Stock{% endblock %}{% block body %}
+<h2>Stock Summary &amp; Ledger</h2>
+<p><a class="btn" href="{{ url_for('stock_csv') }}">Download stock report (CSV)</a></p>
+<div class="card"><h3>Raw materials</h3><table>
+<tr><th>Material</th><th class="num">Balance</th><th class="num">Avg rate</th></tr>
+{% for m, b in rm %}<tr><td>{{ m.name }}</td><td class="num">{{ fmt_qty(b, m.unit) }}</td><td class="num">{{ fmt_money(m.avg_rate_mp // 1000) }}/{{ m.unit }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Finished goods</h3><table>
+<tr><th>Product</th><th class="num">Packets</th></tr>
+{% for p, b in fg %}<tr><td>{{ p.name }}</td><td class="num">{{ b // 1000 }}</td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Stock ledger (latest 100 movements — every balance is derived from this)</h3><table>
+<tr><th>#</th><th>Kind</th><th>Item</th><th class="num">Qty</th><th>Source</th><th>Ref</th><th>By</th><th>When</th></tr>
+{% for s in ledger %}<tr><td>{{ s.id }}</td><td>{{ s.item_kind }}</td><td>{{ s.item_id }}</td><td class="num">{{ '%+d'|format(s.qty_milli // 1000) if s.qty_milli % 1000 == 0 else '%+.3f'|format(s.qty_milli / 1000) }}</td><td>{{ s.source_type }}</td><td>{{ s.ref }}</td><td>{{ s.uname or '—' }}</td><td>{{ s.created_at }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block t %}Invoices{% endblock %}{% block body %}
+<h2>GST Invoices</h2>
+<div class="card"><table>
+<tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Product</th><th class="num">Qty</th><th class="num">Taxable</th><th class="num">CGST</th><th class="num">SGST</th><th class="num">IGST</th><th class="num">Total</th><th>Status</th><th></th></tr>
+{% for i in invoices %}<tr><td><a href="{{ url_for('invoice_view', inv_id=i.id) }}">{{ i.invoice_no }}</a></td><td>{{ i.invoice_date }}</td><td>{{ i.cname }}</td><td>{{ i.pname }}</td><td class="num">{{ i.qty }}</td><td class="num">{{ fmt_money(i.taxable_paise) }}</td><td class="num">{{ fmt_money(i.cgst_paise) }}</td><td class="num">{{ fmt_money(i.sgst_paise) }}</td><td class="num">{{ fmt_money(i.igst_paise) }}</td><td class="num">{{ fmt_money(i.total_paise) }}</td><td><span class="badge {{ i.status }}">{{ i.status }}</span></td><td><a class="btn" href="{{ url_for('invoice_pdf', inv_id=i.id) }}">PDF</a></td></tr>{% endfor %}</table></div>
+{% endblock %}

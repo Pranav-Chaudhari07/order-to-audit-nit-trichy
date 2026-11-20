@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block t %}Purchases{% endblock %}{% block body %}
+<h2>Purchases (raw material inwards)</h2>
+{% if user.role in ('admin','production','owner') %}
+<div class="card"><h3>Record purchase</h3><form method="post">
+<p><label>Supplier<br><select name="supplier_id">{% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select></label></p>
+<p><label>Material<br><select name="raw_material_id">{% for m in materials %}<option value="{{ m.id }}">{{ m.name }} ({{ m.unit }})</option>{% endfor %}</select></label></p>
+<p><label>Quantity<br><input name="qty" step="0.01" required></label></p>
+<p><label>Rate (Rs per unit)<br><input name="rate" step="0.01" required></label></p>
+<p><label>Bill no.<br><input name="bill_no"></label></p>
+<button type="submit">Record purchase</button></form></div>
+{% endif %}
+<div class="card"><table>
+<tr><th>#</th><th>Date</th><th>Supplier</th><th>Material</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amount</th></tr>
+{% for p in purchases %}<tr><td>{{ p.id }}</td><td>{{ p.purchase_date }}</td><td>{{ p.sname }}</td><td>{{ p.mname }}</td><td class="num">{{ fmt_qty(p.qty_milli, p.unit) }}</td><td class="num">{{ fmt_money(p.rate_mp // 1000) }}/{{ p.unit }}</td><td class="num">{{ fmt_money(p.amount_paise) }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

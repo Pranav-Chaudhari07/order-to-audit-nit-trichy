@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block t %}Orders{% endblock %}{% block body %}
+<h2>Orders</h2>
+{% if user.role in ('salesman','admin') %}
+<div class="card"><h3>New order (mobile-friendly)</h3>
+<form method="post" action="{{ url_for('order_new') }}">
+<p><label>Customer<br><select name="customer_id">{% for c in customers %}<option value="{{ c.id }}">{{ c.name }} ({{ c.state }})</option>{% endfor %}</select></label></p>
+<p><label>Product<br><select name="product_id">{% for p in products %}<option value="{{ p.id }}">{{ p.name }} — {{ fmt_money(p.selling_price_paise) }}/packet</option>{% endfor %}</select></label></p>
+<p><label>Quantity (packets)<br><input type="number" name="qty" min="1" required></label></p>
+<button type="submit">Place order</button></form></div>
+{% endif %}
+<div class="card"><table>
+<tr><th>#</th><th>Salesman</th><th>Customer</th><th>Product</th><th class="num">Qty</th><th>Status</th><th>Actions</th></tr>
+{% for o in orders %}<tr><td>{{ o.id }}</td><td>{{ o.sname }}</td><td>{{ o.cname }}</td><td>{{ o.pname }}</td>
+<td class="num">{{ o.qty }}</td><td><span class="badge {{ o.status }}">{{ o.status }}</span>{% if o.shortage_qty %} short by {{ o.shortage_qty }}{% endif %}</td>
+<td>{% if user.role in ('admin','owner') and o.status in ('pending','shortage') %}
+<form class="inline" method="post" action="{{ url_for('order_approve', oid=o.id) }}"><button>Approve</button></form>
+<form class="inline" method="post" action="{{ url_for('order_reject', oid=o.id) }}"><button class="secondary btn">Reject</button></form>{% endif %}
+{% if user.role in ('admin','owner') and o.status == 'approved' %}
+<form class="inline" method="post" action="{{ url_for('order_invoice', oid=o.id) }}"><button>Raise GST invoice &amp; dispatch</button></form>{% endif %}</td></tr>
+{% endfor %}</table></div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block t %}{{ inv.invoice_no }}{% endblock %}{% block body %}
+<h2>Tax Invoice {{ inv.invoice_no }} <span class="badge {{ inv.status }}">{{ inv.status }}</span></h2>
+<div class="card">
+<p><b>South Indian Snacks Co.</b>, Factory, Tamil Nadu — GSTIN 33XXXXX0000X1Z5</p>
+<p><b>Bill to:</b> {{ inv.cname }}, {{ inv.caddr }}, {{ inv.cstate }} — GSTIN {{ inv.cgstin or 'Unregistered' }}<br>
+Date: {{ inv.invoice_date }} &nbsp;|&nbsp; Salesman: {{ inv.sname }} &nbsp;|&nbsp; Place of supply: {{ inv.cstate }}</p>
+<table><tr><th>Item</th><th>HSN</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Taxable</th></tr>
+<tr><td>{{ inv.pname }}</td><td>{{ inv.hsn }}</td><td class="num">{{ inv.qty }}</td><td class="num">{{ fmt_money(inv.price) }}</td><td class="num">{{ fmt_money(inv.taxable_paise) }}</td></tr></table>
+<p style="text-align:right">Taxable: {{ fmt_money(inv.taxable_paise) }}<br>
+{% if inv.cgst_paise %}CGST @ 2.5%: {{ fmt_money(inv.cgst_paise) }}<br>SGST @ 2.5%: {{ fmt_money(inv.sgst_paise) }}<br>{% endif %}
+{% if inv.igst_paise %}IGST @ 5%: {{ fmt_money(inv.igst_paise) }}<br>{% endif %}
+<b>Total: {{ fmt_money(inv.total_paise) }}</b></p>
+<p><a class="btn" href="{{ url_for('invoice_pdf', inv_id=inv.id) }}">Download PDF</a></p>
+{% if inv.status == 'posted' and user.role in ('admin','owner') %}
+<form method="post" action="{{ url_for('invoice_cancel', inv_id=inv.id) }}">
+<input name="reason" placeholder="Cancellation reason" required>
+<button class="danger btn" type="submit">Cancel via credit note (never deletes)</button></form>{% endif %}
+{% for n in notes %}<p>Credit note {{ n.credit_no }}: {{ fmt_money(n.amount_paise) }} — {{ n.reason }}</p>{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block t %}Payments{% endblock %}{% block body %}
+<h2>Payments &amp; Outstanding</h2>
+{% if user.role != 'accountant' %}
+<div class="card"><h3>Record payment</h3><form method="post">
+<p><label>Invoice<br><select name="invoice_id">{% for i, paid, bal in outstanding %}{% if bal > 0 %}<option value="{{ i.id }}">{{ i.invoice_no }} — {{ i.cname }} (due {{ fmt_money(bal) }})</option>{% endif %}{% endfor %}</select></label></p>
+<p><label>Amount (Rs)<br><input name="amount" type="number" step="0.01" min="0.01" required></label></p>
+<p><label>Method<br><select name="method"><option>Bank</option><option>Cash</option><option>UPI</option></select></label></p>
+<p><label>Date<br><input type="date" name="payment_date"></label></p>
+<button type="submit">Record payment</button></form></div>
+{% endif %}
+<div class="card"><h3>Outstanding by invoice</h3><table>
+<tr><th>Invoice</th><th>Customer</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Outstanding</th></tr>
+{% for i, paid, bal in outstanding %}<tr><td>{{ i.invoice_no }}</td><td>{{ i.cname }}</td><td class="num">{{ fmt_money(i.total_paise) }}</td><td class="num">{{ fmt_money(paid) }}</td><td class="num"><b>{{ fmt_money(bal) }}</b></td></tr>{% endfor %}</table></div>
+<div class="card"><h3>Recent payments</h3><table>
+<tr><th>Date</th><th>Customer</th><th class="num">Amount</th><th>Method</th></tr>
+{% for p in payments %}<tr><td>{{ p.payment_date }}</td><td>{{ p.cname }}</td><td class="num">{{ fmt_money(p.amount_paise) }}</td><td>{{ p.method }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

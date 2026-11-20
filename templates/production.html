@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block t %}Production{% endblock %}{% block body %}
+<h2>Production Runs</h2>
+{% if user.role in ('production','admin','owner') %}
+<div class="card"><h3>New production run — Murukku 200g (1 batch = 200 packets expected)</h3>
+<form method="post">
+<p><label>Product<br><select name="product_id">{% for p in products %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select></label></p>
+<p><label>Expected packets<br><input type="number" name="expected_packets" value="200" required></label></p>
+<p><label>Good packets produced<br><input type="number" name="good_packets" required></label></p>
+<p><label>Damaged pouches (pcs)<br><input type="number" name="damaged_pouches" value="0"></label></p>
+<p><label>Cartons used (pcs)<br><input type="number" name="cartons_used" value="0"></label></p>
+<h4>Actual consumption (edit if different from BOM standard)</h4>
+<p><label>Flour (kg)<br><input name="qty_1" step="0.01" value="40"></label></p>
+<p><label>Cooking oil (L)<br><input name="qty_2" step="0.01" value="10"></label></p>
+<p><label>Salt and spice mix (kg)<br><input name="qty_3" step="0.01" value="1.2"></label></p>
+<p><label>200g pouches (pcs)<br><input name="qty_4" step="1" value="200"></label></p>
+<p><label>Cartons (pcs)<br><input name="qty_5" step="1" value="10"></label></p>
+<p><label>Labour (Rs)<br><input name="labour" type="number" step="0.01" value="0"></label></p>
+<p><label>Gas / power overhead (Rs)<br><input name="overhead" type="number" step="0.01" value="0"></label></p>
+<button type="submit">Record run (updates stock automatically)</button></form>
+<p style="font-size:.85rem;color:#666">Note: pouches consumed = good packets + damaged pouches (e.g. 188 good + 6 damaged = 194). Enter the actual pouch count used.</p></div>
+{% endif %}
+{% for r, cons, yv in runs %}
+<div class="card"><h3>Run #{{ r.id }} — {{ r.pname }} ({{ r.run_date }})</h3>
+<p>Expected {{ r.expected_packets }} → good {{ r.good_packets }}.
+Yield variance: <b style="color:{% if yv|abs > 3 %}#a11{% else %}#2a7{% endif %}">{{ '%+.1f'|format(yv) }}%</b>
+{% if yv|abs > 3 %} — <b>FLAGGED (&gt;3%)</b>{% endif %}</p>
+<table><tr><th>Material</th><th class="num">Standard</th><th class="num">Actual</th><th class="num">Variance</th><th class="num">Amount</th></tr>
+{% for c in cons %}{% set cv = ((c.qty_milli - c.std) / c.std * 100) %}
+<tr><td>{{ c.mname }}</td><td class="num">{{ fmt_qty(c.std, c.unit) }}</td><td class="num">{{ fmt_qty(c.qty_milli, c.unit) }}</td>
+<td class="num" style="color:{% if cv|abs > 3 %}#a11{% endif %}">{{ '%+.1f'|format(cv) }}%{% if cv|abs > 3 %} — FLAGGED{% endif %}</td>
+<td class="num">{{ fmt_money(c.amount_paise) }}</td></tr>{% endfor %}</table>
+<p>Materials {{ fmt_money(r.material_cost_paise) }} + labour {{ fmt_money(r.labour_paise) }} + overhead {{ fmt_money(r.overhead_paise) }} = <b>{{ fmt_money(r.total_cost_paise) }}</b> → <b>cost/packet {{ fmt_money(r.cost_per_packet_paise or 0) }}</b>. Damaged pouches: {{ r.damaged_pouches }}, cartons used: {{ r.cartons_used }}.</p>
+</div>{% endfor %}
+{% endblock %}
